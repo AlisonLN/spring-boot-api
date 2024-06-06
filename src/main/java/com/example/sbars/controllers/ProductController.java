@@ -9,9 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 
 import java.util.List;
-import java.util.Objects;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,7 +32,14 @@ public class ProductController {
     }
     @GetMapping("/products")
     public ResponseEntity<List<ProductModel>> getAllProducts() {
-        return ResponseEntity.status(HttpStatus.OK).body(productRepository.findAll());
+        List<ProductModel> productslList = productRepository.findAll();
+        if (!productslList.isEmpty()) {
+            for (ProductModel product : productslList) {
+                UUID id =  product.getIdPoduct();
+                product.add(linkTo(methodOn(ProductController.class).getOneProduct(id)).withSelfRel());
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(productslList);
     }
     @GetMapping("/products/{id}")
     public ResponseEntity<Object> getOneProduct(@PathVariable(value = "id")UUID id) {
@@ -37,6 +47,7 @@ public class ProductController {
         if (productO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product NOT FOUND. ");
         }
+        productO.get().add(linkTo(methodOn(ProductController.class).getAllProducts()).withRel("Products List "));
         return ResponseEntity.status(HttpStatus.OK).body(productO.get());
     }
     @PutMapping("/products/{id}")

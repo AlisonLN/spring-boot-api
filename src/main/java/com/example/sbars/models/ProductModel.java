@@ -1,6 +1,7 @@
 package com.example.sbars.models;
 
 import jakarta.persistence.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 @Entity // para que seja uma entidade da base de dados, para fazer o mapeamento da classe java para o banco
 @Table(name = "TB_PRODUCTS")
-public class ProductModel implements Serializable {
+public class ProductModel extends RepresentationModel<ProductModel> implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L; //numero de controle de versao
 
